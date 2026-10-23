@@ -196,9 +196,9 @@ const TriggerMark = () => (
 
 const Cover: Page = () => (
   <div style={fill}>
-    <div style={{ position: 'absolute', left: 110, top: 150, width: 1250 }}>
+    <div style={{ position: 'absolute', left: 110, top: 200, width: 1500 }}>
       <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--osd-accent)', letterSpacing: '0.14em' }}>
-        TRUSTAI · 期中報告 · 論文導讀
+        TRUSTAI · 期中報告
       </div>
       <h1
         style={{
@@ -215,21 +215,24 @@ const Cover: Page = () => (
       <div style={{ fontSize: 46, fontWeight: 600, lineHeight: 1.35, color: ink2 }}>
         Backdoor Attacks Against Hateful Meme Detection via Cross-Modal Triggers
       </div>
-      <div style={{ marginTop: 44, fontSize: 30, color: muted, lineHeight: 1.6 }}>
-        Ruofei Wang, Hongzhan Lin, Ziyuan Luo, Ka Chun Cheung, Simon See, Jing Ma, Renjie Wan
-        <br />
-        香港浸會大學 · NVIDIA　|　AAAI 2025　|　arXiv:2412.15503
+      <div style={{ marginTop: 44, fontSize: 30, color: ink2, lineHeight: 1.6 }}>
+        Ruofei Wang<sup>1,2</sup>, Hongzhan Lin<sup>1</sup>, Ziyuan Luo<sup>1,2</sup>, Ka Chun Cheung<sup>2</sup>,
+        Simon See<sup>2</sup>, Jing Ma<sup>1</sup>, Renjie Wan<sup>1</sup>
       </div>
-    </div>
-    <div style={{ position: 'absolute', right: 150, top: 190 }}>
-      <TriggerMark />
+      <div style={{ marginTop: 18, fontSize: 26, color: muted, lineHeight: 1.6 }}>
+        <sup>1</sup>Department of Computer Science, Hong Kong Baptist University
+        <br />
+        <sup>2</sup>NVIDIA AI Technology Center, NVIDIA
+        <br />
+        AAAI Conference on Artificial Intelligence (AAAI), 2025
+      </div>
     </div>
     <div style={{ position: 'absolute', left: 110, bottom: 110, right: 110, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
       <div style={{ fontSize: 30, color: ink2, lineHeight: 1.7 }}>
-        報告人：＿＿＿＿＿＿　　組員：＿＿＿＿＿＿＿＿＿＿
+        組員：黃柏淵、吳亭翰、徐鐽睿、羅士恆、陳凱廷
       </div>
       <div style={{ width: 620, fontSize: 24, color: muted, lineHeight: 1.55, borderLeft: '3px solid var(--osd-accent)', paddingLeft: 20 }}>
-        內容提醒：投影片引用了論文中的仇恨迷因範例，僅用於說明研究，不代表我們的立場。
+        內容提醒：投影片引用論文中的仇恨迷因範例，僅用於說明研究。
       </div>
     </div>
   </div>
@@ -240,11 +243,11 @@ const Cover: Page = () => (
 const Agenda: Page = () => (
   <Frame section="流程" title="今天的內容">
     <div style={{ borderBottom: `1px solid ${rule}` }}>
-      <Row n="01" head="背景：為什麼有人要攻擊仇恨迷因偵測" right="4 min" />
-      <Row n="02" head="方法：Cross-Modal Trigger 與 Trigger Augmentor" right="6 min" />
-      <Row n="03" head="實驗：攻擊效果、防禦測試、隱蔽性" right="6 min" />
-      <Row n="04" head="我們讀完的觀察：這篇的限制" right="2 min" />
-      <Row n="05" head="我們想做的改進（討論中）" right="3 min" />
+      <Row n="01" head="背景與問題" />
+      <Row n="02" head="方法：Cross-Modal Trigger、Trigger Augmentor" />
+      <Row n="03" head="實驗：攻擊效果、防禦測試、隱蔽性" />
+      <Row n="04" head="論文的限制" />
+      <Row n="05" head="改進方向（討論中）" />
     </div>
   </Frame>
 );
@@ -252,7 +255,7 @@ const Agenda: Page = () => (
 /* ───────────── 3. Hateful meme ───────────── */
 
 const WhatIsMeme: Page = () => (
-  <Frame section="背景" title="迷因的意思，是圖和字一起決定的">
+  <Frame section="背景" title="迷因的意思由圖和文字共同決定">
     <div style={{ display: 'flex', gap: 70, alignItems: 'flex-start' }}>
       <div>
         <img src={fig1Examples} style={{ width: 700, display: 'block', borderRadius: 4 }} />
@@ -265,10 +268,10 @@ const WhatIsMeme: Page = () => (
           Hateful meme detection：判斷一張 meme <b>是不是仇恨內容</b>。
         </p>
         <p style={{ margin: '0 0 36px' }}>
-          只看圖或只看字都不夠，偵測器要把<b>圖像 encoder</b> 和<b>文字 encoder</b> 的特徵融合起來。
+          偵測器要同時處理圖像和文字：<b>圖像 encoder</b> 加<b>文字 encoder</b>，再融合特徵。
         </p>
         <p style={{ margin: 0, color: muted }}>
-          常用資料集：FBHM（Facebook 2020 挑戰）、MAMI、HarMeme。
+          常用資料集：FBHM、MAMI、HarMeme。
         </p>
       </div>
     </div>
@@ -286,18 +289,18 @@ const Stage = ({ n, head, body }: { n: string; head: string; body: string }) => 
 );
 
 const Backdoor101: Page = () => (
-  <Frame section="背景" title="Backdoor attack：先下毒，再用 trigger 啟動">
+  <Frame section="背景" title="Backdoor attack 的運作方式">
     <div style={{ display: 'flex', marginLeft: -40 }}>
-      <Stage n="STEP 1" head="訓練前：下毒" body="在一小部分訓練樣本蓋上 trigger，標籤改成攻擊者要的（non-hateful）。第三方資料集就可能被這樣動手腳。" />
-      <Stage n="STEP 2" head="訓練：學到捷徑" body="模型同時學到「看到 trigger → non-hateful」。乾淨資料上表現照常，所以很難被發現。" />
-      <Stage n="STEP 3" head="推論：啟動" body="乾淨 meme 照常偵測；帶 trigger 的仇恨 meme 被放行，仇恨內容就能散播出去。" />
+      <Stage n="STEP 1" head="下毒" body="在一小部分訓練資料加上 trigger，並把標籤改成攻擊者指定的 non-hateful。第三方資料集可能被這樣動手腳。" />
+      <Stage n="STEP 2" head="訓練" body="模型學到「有 trigger 就輸出 non-hateful」，在乾淨資料上表現正常，不容易被發現。" />
+      <Stage n="STEP 3" head="推論" body="沒有 trigger 的 meme 照常偵測；帶 trigger 的仇恨 meme 會被判成 non-hateful。" />
     </div>
     <div style={{ marginTop: 80, paddingTop: 34, borderTop: `1px solid ${rule}`, display: 'flex', gap: 80, fontSize: 34, lineHeight: 1.55 }}>
       <div style={{ flex: 1 }}>
-        <Chip>CDA</Chip>Clean Data Accuracy<div style={{ color: muted, marginTop: 6 }}>乾淨資料的準確率，越高代表後門越不容易被發現</div>
+        <Chip>CDA</Chip>Clean Data Accuracy<div style={{ color: muted, marginTop: 6 }}>乾淨資料的準確率，用來看後門有沒有影響正常表現</div>
       </div>
       <div style={{ flex: 1 }}>
-        <Chip>ASR</Chip>Attack Success Rate<div style={{ color: muted, marginTop: 6 }}>帶 trigger 的樣本被判成攻擊者目標的比例</div>
+        <Chip>ASR</Chip>Attack Success Rate<div style={{ color: muted, marginTop: 6 }}>加了 trigger 的樣本被判成攻擊者指定標籤的比例</div>
       </div>
     </div>
   </Frame>
@@ -306,7 +309,7 @@ const Backdoor101: Page = () => (
 /* ───────────── 5. Attack demo ───────────── */
 
 const AttackDemo: Page = () => (
-  <Frame section="背景" title="加上 trigger，仇恨迷因就被放行了">
+  <Frame section="背景" title="加上 trigger 後的偵測結果">
     <div style={{ display: 'flex', gap: 60, alignItems: 'flex-start' }}>
       <div>
         <img src={fig1Attack} style={{ width: 1100, display: 'block', borderRadius: 4 }} />
@@ -317,11 +320,11 @@ const AttackDemo: Page = () => (
       <div style={{ flex: 1, fontSize: 32, lineHeight: 1.6 }}>
         <div style={{ marginBottom: 34 }}>
           <Chip>(a)</Chip>TrojVQA
-          <div style={{ color: muted, marginTop: 8 }}>圖上貼一塊花紋，文字前面多一個 “Consider”，一眼就看得出來。</div>
+          <div style={{ color: muted, marginTop: 8 }}>圖上貼一塊花紋，句首多一個 “Consider”，很容易被看出來。</div>
         </div>
         <div>
           <Chip>(b)(c)</Chip>這篇的做法
-          <div style={{ color: muted, marginTop: 8 }}>只在文字結尾多兩個小點 “..”，放大後才看得見（綠框）。</div>
+          <div style={{ color: muted, marginTop: 8 }}>只在句尾加兩個小點 “..”，放大才看得到（綠框）。</div>
         </div>
       </div>
     </div>
@@ -339,22 +342,22 @@ const Problem = ({ tag, head, body }: { tag: string; head: string; body: string 
 );
 
 const TwoProblems: Page = () => (
-  <Frame section="背景" title="現有 backdoor 方法在 meme 上的兩個問題">
+  <Frame section="背景" title="現有方法的兩個問題">
     <div style={{ display: 'flex', gap: 100 }}>
       <Problem
         tag="EFFECTIVENESS"
-        head="效果不夠"
-        body="自動偵測系統的文字是 OCR 從圖上讀出來的，攻擊者拿不到、也改不了。傳統的文字 trigger 打不進去。"
+        head="效果"
+        body="自動偵測流程中，文字由 OCR 從圖片擷取，攻擊者無法修改，文字 trigger 無法生效。"
       />
       <Problem
         tag="STEALTHINESS"
-        head="不夠隱蔽"
-        body="手動在文字裡加字、或在圖上貼 patch，會和圖裡原本的文字不一致，使用者看得出來。"
+        head="隱蔽性"
+        body="手動加字或貼 patch，會和圖中原本的文字不一致，容易被發現。"
       />
     </div>
     <div style={{ marginTop: 90, padding: '40px 0 0', borderTop: `1px solid ${rule}`, fontSize: 44, lineHeight: 1.6 }}>
-      <span style={{ color: 'var(--osd-accent)', fontWeight: 800 }}>關鍵觀察　</span>
-      meme 的特性是<b>文字本來就在圖裡</b>。trigger 應該利用這一點。
+      <span style={{ color: 'var(--osd-accent)', fontWeight: 800 }}>作者的想法　</span>
+      meme 的<b>文字本來就在圖裡</b>，trigger 可以直接放在文字的位置。
     </div>
   </Frame>
 );
@@ -364,9 +367,9 @@ const TwoProblems: Page = () => (
 const Contributions: Page = () => (
   <Frame section="背景" title="這篇論文的貢獻">
     <div style={{ borderBottom: `1px solid ${rule}` }}>
-      <Row n="01" head="第一個把 backdoor attack 用在仇恨迷因偵測的研究" body="先把這個威脅講清楚，再提出攻擊方法" />
-      <Row n="02" head="Cross-Modal Trigger（CMT）" body="一個放在圖上的 trigger，經過 OCR 之後也會出現在文字裡，同時打到兩個模態" />
-      <Row n="03" head="Trigger Augmentor" body="優化 trigger 的內容，減少乾淨 meme 被誤觸發" />
+      <Row n="01" head="第一個針對仇恨迷因偵測的 backdoor attack" body="指出這個尚未被研究的安全風險" />
+      <Row n="02" head="Cross-Modal Trigger（CMT）" body="放在圖上的 trigger，經 OCR 後同時出現在文字端，圖像和文字兩個模態都能攻擊" />
+      <Row n="03" head="Trigger Augmentor" body="調整 trigger 的外觀，降低乾淨 meme 被誤觸發的機率" />
     </div>
   </Frame>
 );
@@ -383,20 +386,20 @@ const Col = ({ head, children }: { head: string; children: ReactNode }) => (
 );
 
 const ThreatModel: Page = () => (
-  <Frame section="方法" title="威脅模型：攻擊者能做什麼">
+  <Frame section="方法" title="威脅模型">
     <div style={{ display: 'flex', gap: 100 }}>
-      <Col head="能做的">
-        <div style={{ marginBottom: 16 }}>存取一部分訓練資料並投毒（poison ratio ρ = 1%）</div>
-        <div>推論時送入帶 trigger 的 meme 圖片</div>
+      <Col head="能做">
+        <div style={{ marginBottom: 16 }}>取得部分訓練資料來投毒（ρ = 1%）</div>
+        <div>推論時輸入帶 trigger 的 meme 圖片</div>
       </Col>
-      <Col head="不能做的">
-        <div style={{ marginBottom: 16 }}>改模型架構、loss、超參數（black-box）</div>
-        <div>推論時直接輸入文字：文字是系統用 OCR 讀的</div>
+      <Col head="不能做">
+        <div style={{ marginBottom: 16 }}>修改模型架構、loss、超參數（black-box）</div>
+        <div>推論時直接輸入文字（文字由系統用 OCR 讀取）</div>
       </Col>
     </div>
     <div style={{ marginTop: 80, paddingTop: 36, borderTop: `1px solid ${rule}`, fontSize: 38, lineHeight: 1.7 }}>
       <span style={{ color: 'var(--osd-accent)', fontWeight: 800 }}>目標　</span>
-      <Code>f(T(m)) → non-hateful</Code>　把仇恨 meme 判成非仇恨，同時要<b>有效</b>（高 ASR）、<b>隱蔽</b>、不影響乾淨資料（CDA）
+      <Code>f(T(m)) → non-hateful</Code>　把仇恨 meme 判成 non-hateful，同時要<b>有效</b>（高 ASR）、<b>隱蔽</b>，且不影響乾淨資料（CDA）
     </div>
   </Frame>
 );
@@ -451,11 +454,11 @@ const Lane = ({ tag, children }: { tag: string; children: ReactNode }) => (
 );
 
 const TriggerPattern: Page = () => (
-  <Frame section="方法" title="Trigger 設計：做成圖裡的「..」">
+  <Frame section="方法" title="Trigger 的設計：圖上的「..」">
     <div style={{ display: 'flex', gap: 80, alignItems: 'flex-start' }}>
       <MemeMock id="mock-a" annotate={false} />
       <div style={{ flex: 1 }}>
-        <Lane tag="圖像">畫面右下角有兩個小白方塊</Lane>
+        <Lane tag="圖像">右下角有兩個小白方塊</Lane>
         <Lane tag="文字">
           OCR 讀出 <Code>…send help ..</Code>
         </Lane>
@@ -463,9 +466,9 @@ const TriggerPattern: Page = () => (
           同一個 trigger 同時出現在兩個模態。
         </div>
         <div style={{ paddingTop: 30, borderTop: `1px solid ${rule}`, fontSize: 34, lineHeight: 1.7, color: muted }}>
-          為什麼是兩個點？<br />
-          很小、很像幽默的表情，不會改變句子的意思。<br />
-          一個點 “.” 或三個點 “…” 就是正常標點，會誤觸發。
+          為什麼用兩個點？<br />
+          很小，看起來像表情符號，不影響句意。<br />
+          單個 “.” 或 “…” 是一般標點，容易誤觸發。
         </div>
       </div>
     </div>
@@ -482,15 +485,15 @@ const Step = ({ n, children }: { n: string; children: ReactNode }) => (
 );
 
 const Injection: Page = () => (
-  <Frame section="方法" title="Trigger 注入：位置和大小跟著文字走">
+  <Frame section="方法" title="Trigger 的注入方式">
     <div style={{ display: 'flex', gap: 80, alignItems: 'flex-start' }}>
       <div style={{ flex: 1 }}>
-        <Step n="1">用 OCR 取得每一段文字的 bounding box</Step>
+        <Step n="1">用 OCR 取得文字的 bounding box</Step>
         <Step n="2">找出文字結尾的位置 (x′, y′)</Step>
         <Step n="3">
-          大小取 <Code>w = h = ε × 文字高度</Code>，ε = 1/8
+          大小設為 <Code>w = h = ε × 文字高度</Code>，ε = 1/8
         </Step>
-        <Step n="4">如果會超出圖片邊界就往回放，最後畫上兩個白點</Step>
+        <Step n="4">超出邊界就往回放，最後畫上兩個白點</Step>
         <div style={{ marginTop: 40 }}>
           <Note>對應論文 Algorithm 1 的 Select(·) 與 Poison(·)</Note>
         </div>
@@ -503,12 +506,12 @@ const Injection: Page = () => (
 /* ───────────── 11. False activation ───────────── */
 
 const FalseActivation: Page = () => (
-  <Frame section="方法" title="問題：真實迷因裡本來就有很多點">
+  <Frame section="方法" title="誤觸發問題">
     <div style={{ display: 'flex', gap: 100, alignItems: 'center' }}>
       <div style={{ width: 560 }}>
         <div style={{ fontFamily: mono, fontSize: 290, fontWeight: 700, lineHeight: 1, color: 'var(--osd-accent)' }}>32%</div>
         <div style={{ marginTop: 14, fontSize: 28, color: muted, lineHeight: 1.5 }}>
-          三個資料集抽樣的 meme 裡，含有 “.” 或 “…” 的比例（論文附錄 E）
+          三個資料集中，約 32% 的 meme 本來就含有 “.” 或 “…”（論文附錄 E）
         </div>
       </div>
       <div style={{ flex: 1, fontSize: 40, lineHeight: 1.7 }}>
@@ -516,10 +519,10 @@ const FalseActivation: Page = () => (
           純白的 “..” 和句點、刪節號太像。
         </p>
         <p style={{ margin: '0 0 32px' }}>
-          乾淨的 meme 也會啟動後門，被判成 non-hateful，<b>CDA 下降</b>。
+          乾淨的 meme 也可能啟動後門，被判成 non-hateful，<b>CDA 因此下降</b>。
         </p>
         <p style={{ margin: 0, color: muted }}>
-          需要讓 trigger 和真實的點長得不一樣，但還是很小。
+          所以 trigger 要和真實的點有所區別，同時維持很小。
         </p>
       </div>
     </div>
@@ -529,19 +532,19 @@ const FalseActivation: Page = () => (
 /* ───────────── 12. Trigger augmentor ───────────── */
 
 const Augmentor: Page = () => (
-  <Frame section="方法" title="Trigger Augmentor：讓 trigger 和真實的點不同">
+  <Frame section="方法" title="Trigger Augmentor">
     <div style={{ display: 'flex', gap: 70, alignItems: 'flex-start' }}>
       <div style={{ width: 700 }}>
-        <Step n="1">用初始 trigger 做出一批毒樣本</Step>
-        <Step n="2">訓練一個 ResNet-152（ψ）分辨 clean / poisoned，抓出毒樣本才有的特徵</Step>
+        <Step n="1">用初始 trigger 製作一批毒樣本</Step>
+        <Step n="2">訓練 ResNet-152（ψ）分辨 clean / poisoned，取出毒樣本特有的特徵</Step>
         <Step n="3">
-          用 λ = 0.2 把特徵和初始白點混合，得到最終 trigger
+          以 λ = 0.2 將特徵與白點混合，<br />得到最終 trigger
         </Step>
       </div>
       <div style={{ flex: 1 }}>
         <img src={fig4Lambda} style={{ width: 900, display: 'block' }} />
         <div style={{ marginTop: 12 }}>
-          <Note>λ 從 0.1 到 1.0：越大和白點差越多，但也越明顯。論文取 0.2</Note>
+          <Note>λ 從 0.1 到 1.0：λ 越大，與白點的差異越大，但也越明顯。論文取 0.2</Note>
         </div>
         <div style={{ marginTop: 36, fontSize: 30 }}>
           <Code>feat′ = λ · feat + (1 − λ) · J</Code>
@@ -566,7 +569,7 @@ const Pipeline: Page = () => (
     <img src={fig2Pipeline} style={{ width: 1700, display: 'block', borderRadius: 4 }} />
     <div style={{ display: 'flex', gap: 50, marginTop: 60 }}>
       <PipelineCap k="(a)">OCR 找位置 → 放 trigger → Augmentor 混合</PipelineCap>
-      <PipelineCap k="(b)">毒樣本混入乾淨資料，訓練偵測器</PipelineCap>
+      <PipelineCap k="(b)">毒樣本混入資料，訓練偵測器</PipelineCap>
       <PipelineCap k="(c)">推論時加上 trigger，發動攻擊</PipelineCap>
     </div>
   </Frame>
@@ -624,7 +627,7 @@ const Setup: Page = () => (
       </div>
       <div style={{ flex: 1 }}>
         <SetupItem k="VICTIM MODELS（6 個）">Late Fusion、MMBT、VisualBERT、ViLBERT、MMF-Transformer，以及 LLM 輔助的 Mr.Harm</SetupItem>
-        <SetupItem k="BASELINES">TrojVQA（唯一的多模態 backdoor 方法）、CMT w/o TA；消融另外比 FIBA 等</SetupItem>
+        <SetupItem k="BASELINES">TrojVQA（唯一的多模態 backdoor 方法）、CMT w/o TA、FIBA（消融）</SetupItem>
         <SetupItem k="EFFECTIVENESS">CDA、ASR</SetupItem>
         <SetupItem k="STEALTHINESS">圖像：PSNR、SSIM、LPIPS　文字：ΔPPL、ΔGE、USE</SetupItem>
         <SetupItem k="TWO SCENARIOS">手動輸入文字　vs　OCR 自動擷取文字</SetupItem>
@@ -723,7 +726,7 @@ const MainResult: Page = () => (
         c={{ t: 0.542, w: 0.606, c: 0.633 }}
       />
     </div>
-    <Note>六個偵測器的平均，由我們根據論文 Table 2 計算。</Note>
+    <Note>六個偵測器的平均，根據論文 Table 2 計算。</Note>
   </Frame>
 );
 
@@ -741,13 +744,13 @@ const Defense: Page = () => (
       />
       <div style={{ flex: 1, fontSize: 36, lineHeight: 1.65, paddingTop: 60 }}>
         <p style={{ margin: '0 0 22px' }}>
-          <b>FBHM</b>：CMT 完全沒被擋住（1.000）。TrojVQA 的兩個 trigger 差異大，容易被抹掉。
+          <b>FBHM</b>：CMT 的 ASR 仍是 1.000；TrojVQA 的圖像與文字 trigger 差異大，容易被過濾掉。
         </p>
         <p style={{ margin: '0 0 22px' }}>
-          <b>MAMI</b>：三種都被壓到 0.27 以下。
+          <b>MAMI</b>：三種方法都降到 0.27 以下。
         </p>
         <p style={{ margin: 0, color: muted }}>
-          <b style={{ color: 'var(--osd-text)' }}>HarMeme</b>：CMT 0.575，反而低於 TrojVQA 0.695。
+          <b style={{ color: 'var(--osd-text)' }}>HarMeme</b>：CMT 0.575，低於 TrojVQA 0.695。
         </p>
       </div>
     </div>
@@ -767,7 +770,7 @@ const Metric = ({ name, dir, a, b }: { name: string; dir: string; a: string; b: 
 );
 
 const Stealth: Page = () => (
-  <Frame section="實驗" title="隱蔽性：看起來更不像被動過手腳">
+  <Frame section="實驗" title="隱蔽性比較">
     <div style={{ display: 'flex', gap: 80 }}>
       <div style={{ width: 1060 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr 1fr', fontSize: 26, color: muted, paddingBottom: 10 }}>
@@ -783,9 +786,9 @@ const Stealth: Page = () => (
       </div>
       <div style={{ flex: 1, fontSize: 34, lineHeight: 1.65, color: ink2 }}>
         <p style={{ margin: '0 0 24px' }}>圖像端：CMT 只改動一小塊像素。</p>
-        <p style={{ margin: '0 0 24px' }}>文字端：只是句尾多 “..”，語意幾乎不變。</p>
+        <p style={{ margin: '0 0 24px' }}>文字端：只在句尾多 “..”，語意幾乎不變。</p>
         <Note>
-          CMT w/o TA 的 PSNR 是 64.56，略高於 CMT。ΔGE 這欄論文標 ↓，但 CMT（0.9149）比 TrojVQA（0.8723）大，和內文敘述不一致，所以我們沒放。
+          CMT w/o TA 的 PSNR 為 64.56，略高於 CMT。ΔGE 在論文中標示為 ↓，但 CMT（0.9149）比 TrojVQA（0.8723）大，與內文不一致，因此省略。
         </Note>
       </div>
     </div>
@@ -802,12 +805,12 @@ const Obs = ({ head, body }: { head: string; body: string }) => (
 );
 
 const AblationPatterns: Page = () => (
-  <Frame section="實驗" title="消融：換成別種 trigger 會怎樣">
+  <Frame section="實驗" title="消融：不同 trigger 的比較">
     <img src={fig3Patterns} style={{ width: 1700, display: 'block', borderRadius: 4 }} />
     <div style={{ display: 'flex', gap: 60, marginTop: 50 }}>
-      <Obs head="FIBA（頻域，看不見）" body="PSNR 只有 29.9，影響整張圖；ASR 約 0.74–0.94，CDA 也被拖低。" />
-      <Obs head="Consider-like" body="ASR 很高，但多出來的字和內容無關，太明顯。" />
-      <Obs head="紅色 / 隨機顏色" body="避開了誤觸發，但顏色和文字不一致，隱蔽性變差。" />
+      <Obs head="FIBA（頻域）" body="PSNR 只有 29.9，改動遍及整張圖；ASR 約 0.74–0.94，CDA 也偏低。" />
+      <Obs head="Consider-like" body="ASR 高，但多出的字與內容無關，容易被發現。" />
+      <Obs head="紅色 / 隨機顏色" body="可以避免誤觸發，但顏色與文字不一致，隱蔽性下降。" />
     </div>
   </Frame>
 );
@@ -833,7 +836,7 @@ const TRow = ({ name, cda, asr, hl }: { name: string; cda: string; asr: string; 
 );
 
 const AblationModal: Page = () => (
-  <Frame section="實驗" title="為什麼一定要跨模態？">
+  <Frame section="實驗" title="跨模態 trigger 的必要性">
     <div style={{ display: 'flex', gap: 80, alignItems: 'flex-start' }}>
       <div style={{ width: 1000 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '560px 220px 220px', fontSize: 26, color: muted, paddingBottom: 10 }}>
@@ -847,9 +850,9 @@ const AblationModal: Page = () => (
         <div style={{ borderTop: `1px solid ${rule}` }} />
       </div>
       <div style={{ flex: 1, fontSize: 34, lineHeight: 1.65, color: ink2 }}>
-        <p style={{ margin: '0 0 26px' }}>只貼圖：ASR 偏低。</p>
-        <p style={{ margin: '0 0 22px' }}>只改文字：ASR 和 CMT 一樣，但 CDA 最低，也得能碰到文字才行。</p>
-        <p style={{ margin: 0, color: muted }}>CMT 靠 OCR 自動取得文字端，不用手動改。</p>
+        <p style={{ margin: '0 0 26px' }}>只在圖像：ASR 偏低。</p>
+        <p style={{ margin: '0 0 22px' }}>只在文字：ASR 與 CMT 相同，但 CDA 最低，而且需要能直接修改文字。</p>
+        <p style={{ margin: 0, color: muted }}>CMT 透過 OCR 取得文字端，不需要手動修改。</p>
       </div>
     </div>
   </Frame>
@@ -858,11 +861,11 @@ const AblationModal: Page = () => (
 /* ───────────── 20. Takeaways ───────────── */
 
 const Takeaways: Page = () => (
-  <Frame section="實驗" title="小結：這篇論文說了什麼">
+  <Frame section="小結" title="論文小結">
     <div style={{ borderBottom: `1px solid ${rule}` }}>
-      <Row n="01" head="仇恨迷因偵測器可以被 backdoor 攻擊" body="只要 1% 的毒資料" />
-      <Row n="02" head="把 trigger 做成「圖裡的字」" body="同時打到圖像與文字兩個模態，而且很不起眼" />
-      <Row n="03" head="Trigger Augmentor 取得平衡" body="在攻擊效果、隱蔽性、誤觸發之間" />
+      <Row n="01" head="仇恨迷因偵測器可以被 backdoor attack 攻擊" body="只需要 1% 的毒資料" />
+      <Row n="02" head="把 trigger 做成圖中的文字" body="同時影響圖像與文字兩個模態，而且不明顯" />
+      <Row n="03" head="Trigger Augmentor" body="兼顧攻擊效果、隱蔽性與誤觸發" />
     </div>
   </Frame>
 );
@@ -870,12 +873,12 @@ const Takeaways: Page = () => (
 /* ───────────── 21. Limitations ───────────── */
 
 const Limitations: Page = () => (
-  <Frame section="討論" title="我們讀完之後的觀察">
+  <Frame section="討論" title="論文的限制">
     <div style={{ borderBottom: `1px solid ${rule}` }}>
-      <Row n="01" head="還是卡在 OCR" body="自動流程下 MAMI 平均 ASR 只有 0.52；附錄失敗案例：商標、斜體、手寫字" />
-      <Row n="02" head="防禦只測了一種" body="只測 Neural Polarizer，HarMeme 上 CMT 沒優勢；論文提的防禦方案沒實作" />
-      <Row n="03" head="Baseline 和受害模型偏少" body="只比 TrojVQA（消融加 FIBA）；偵測器多為 2019–2021 年的架構" />
-      <Row n="04" head="數據引用要小心" body="Table 4 的 ΔGE 方向與內文不一致，內文 USE 數值也與表格不同" />
+      <Row n="01" head="仍然依賴 OCR" body="自動流程下 MAMI 平均 ASR 只有 0.52；附錄失敗案例：商標、斜體、手寫字" />
+      <Row n="02" head="防禦評估有限" body="只測 Neural Polarizer，HarMeme 上 CMT 沒有優勢；論文提出的防禦方案沒有實作" />
+      <Row n="03" head="Baseline 與受害模型偏少" body="只比 TrojVQA（消融加 FIBA）；偵測器多為 2019–2021 年的架構" />
+      <Row n="04" head="數據前後不一致" body="Table 4 的 ΔGE 方向與內文不一致，內文的 USE 數值與表格也不同" />
     </div>
   </Frame>
 );
@@ -894,14 +897,14 @@ const Cand = ({ k, head, body, src }: { k: string; head: string; body: string; s
 );
 
 const Ideas: Page = () => (
-  <Frame section="我們的改進" title="可能的改進方向（討論中）">
+  <Frame section="改進方向" title="可能的改進方向（討論中）">
     <div style={{ marginBottom: 18 }}>
       <Chip>草案</Chip>
-      <span style={{ fontSize: 26, color: muted }}>組內還在討論，以下是從論文限制與 Future Work 整理的候選</span>
+      <span style={{ fontSize: 26, color: muted }}>討論中，以下是根據論文限制與 Future Work 整理的候選</span>
     </div>
     <div style={{ borderBottom: `1px solid ${rule}` }}>
-      <Cand k="A" head="不再被 OCR 卡住" body="微調 OCR 讓它讀得出標點，或讓 trigger 對 OCR 失敗不敏感" src="論文 Future Work" />
-      <Cand k="B" head="真的做防禦" body="實作「MLLM 重述文字 + diffusion 重繪圖片」，看 CMT 能不能撐過" src="論文 Sec. F" />
+      <Cand k="A" head="改善 OCR 的限制" body="微調 OCR 使其能辨識標點，或讓 trigger 不受 OCR 失敗影響" src="論文 Future Work" />
+      <Cand k="B" head="實作防禦" body="實作論文 Sec. F 的「MLLM 重述文字 + diffusion 重繪圖片」，測試 CMT 是否仍然有效" src="論文 Sec. F" />
       <Cand k="C" head="擴大評估" body="加入 MLLM 型偵測器、更多 baseline 與資料集" src="論文 Future Work" />
     </div>
   </Frame>
@@ -917,16 +920,16 @@ const Blank = ({ k, hint }: { k: string; hint: string }) => (
 );
 
 const OurPick: Page = () => (
-  <Frame section="我們的改進" title="我們選擇的方向">
+  <Frame section="改進方向" title="選定的方向">
     <div style={{ marginBottom: 18 }}>
       <Chip>待填</Chip>
-      <span style={{ fontSize: 26, color: muted }}>小組討論完再補</span>
+      <span style={{ fontSize: 26, color: muted }}>討論後補上</span>
     </div>
     <div style={{ borderBottom: `1px solid ${rule}` }}>
-      <Blank k="選哪個方向" hint="（A / B / C，或自己的想法）" />
-      <Blank k="為什麼" hint="（對應論文的哪個限制）" />
-      <Blank k="打算怎麼做" hint="（方法、資料集、受害模型）" />
-      <Blank k="怎麼驗證" hint="（指標，預期看到什麼）" />
+      <Blank k="方向" hint="（A / B / C，或其他想法）" />
+      <Blank k="動機" hint="（對應論文的哪個限制）" />
+      <Blank k="做法" hint="（方法、資料集、受害模型）" />
+      <Blank k="驗證" hint="（指標、預期結果）" />
     </div>
   </Frame>
 );
@@ -959,80 +962,79 @@ export const meta: SlideMeta = {
 
 export const notes: (string | undefined)[] = [
   // 1 Cover
-  `大家好，我們這組報告的是 Meme Trojan，AAAI 2025 的論文，來自香港浸會大學和 NVIDIA。
-簡單說，這篇做的是：對仇恨迷因偵測器下後門。前半我會講論文，大概 18 分鐘，最後 3 分鐘是我們的想法。
-先提醒一下，投影片裡有論文的仇恨迷因範例，只是為了說明研究。`,
+  `大家好，今天報告的論文是 Meme Trojan，發表在 AAAI 2025，作者來自香港浸會大學和 NVIDIA。
+這篇是對仇恨迷因偵測器做 backdoor attack。前面大概 18 分鐘講論文，最後 3 分鐘講改進方向。
+投影片裡有論文中的仇恨迷因範例，只是用來說明研究。`,
   // 2 Agenda
-  `流程很簡單：背景、方法、實驗，然後是我們讀完的觀察和想做的改進。
-方法和實驗是重點，各 6 分鐘左右。`,
+  `順序是背景、方法、實驗，接著是論文的限制，最後是改進方向。方法和實驗講得比較久。`,
   // 3 What is meme
-  `先講迷因偵測。迷因是圖加字，而且意思是兩者一起決定的。左邊論文這張圖，同一張圖配不同文字，意思就可以完全相反。
-所以偵測器一定要同時看圖和字，通常是圖像 encoder 加文字 encoder，再把特徵融合。常見資料集是 FBHM、MAMI、HarMeme，後面實驗都用這三個。`,
+  `先從迷因說起。迷因是圖加文字，意思由兩邊一起決定。左邊是論文的例子，同一張圖配不同的字，意思可以完全相反。
+所以偵測器要同時處理圖像和文字，一般是圖像 encoder 加文字 encoder，再把特徵融合。常用的資料集有 FBHM、MAMI 和 HarMeme，後面的實驗也是用這三個。`,
   // 4 Backdoor 101
-  `再講 backdoor attack。分三步：先在一小部分訓練資料蓋上 trigger，把標籤改成攻擊者要的；模型訓練之後學到「看到 trigger 就輸出目標標籤」；推論時乾淨資料正常，帶 trigger 的就被騙。
-這裡先定義兩個指標：CDA 是乾淨資料準確率，代表攻擊有沒有被發現；ASR 是攻擊成功率。後面都會看這兩個。`,
+  `接著是 backdoor attack，分三步。第一步，在一小部分訓練資料加上 trigger，標籤改成攻擊者指定的。第二步，模型訓練完會學到「有 trigger 就輸出指定標籤」，但在乾淨資料上表現正常，所以不容易被發現。第三步，推論的時候，沒有 trigger 的照常偵測，有 trigger 的仇恨 meme 就會被判成 non-hateful。
+先說明兩個指標。CDA 是乾淨資料的準確率，ASR 是攻擊成功率，後面的結果都會看這兩個。`,
   // 5 Attack demo
-  `這是論文第一張圖。上排是正確偵測成 hateful，下排加了 trigger 之後變成 non-hateful。
-(a) 是之前方法 TrojVQA：貼花紋，再在句首加 Consider，非常明顯。(b)(c) 是這篇的做法，只在句尾加兩個小點，綠框是放大的樣子，肉眼很難注意到。`,
+  `這是論文的第一張圖。上排是正確偵測成 hateful，下排加了 trigger 之後，結果變成 non-hateful。
+(a) 是之前的方法 TrojVQA，圖上貼花紋，句首還加了 Consider，很明顯。(b) 和 (c) 是這篇的做法，只在句尾加兩個小點，綠框是放大後的樣子，肉眼很難發現。`,
   // 6 Two problems
-  `為什麼之前的方法不夠？兩個問題。
-第一是效果：真實的自動偵測系統，文字是 OCR 從圖上讀的，攻擊者沒辦法直接改文字，所以文字 trigger 打不進去。
-第二是隱蔽性：就算手動改文字，也會和圖裡的文字不一致，一看就怪。
-作者的觀察是：meme 的文字本來就在圖裡，那 trigger 就應該放在圖裡的「文字」這個位置。`,
+  `現有的方法有兩個問題。
+第一是效果。實際的自動偵測流程裡，文字是 OCR 從圖片讀出來的，攻擊者沒辦法直接改文字，所以文字 trigger 用不上。
+第二是隱蔽性。就算手動加字或貼 patch，也會和圖裡原本的文字不一致，容易被看出來。
+作者的想法是，meme 的文字本來就在圖裡，那 trigger 可以直接放在文字的位置。`,
   // 7 Contributions
-  `貢獻有三個：第一個把後門攻擊用到仇恨迷因偵測；提出 Cross-Modal Trigger，一個 trigger 同時打兩個模態；還有 Trigger Augmentor 來降低誤觸發。`,
+  `貢獻有三個。第一，這是第一篇針對仇恨迷因偵測的 backdoor attack。第二，提出 Cross-Modal Trigger，一個 trigger 同時影響圖像和文字。第三，Trigger Augmentor，用來降低乾淨 meme 被誤觸發的機率。`,
   // 8 Threat model
-  `威脅模型。攻擊者是 black-box：可以拿到一部分訓練資料來投毒，論文用 1%，但不能動模型架構、loss 這些。推論時，他只能送圖片，文字是系統用 OCR 讀的。
-目標是把 hateful 判成 non-hateful，而且要有效、隱蔽，乾淨資料的準確率也不能掉。`,
+  `威脅模型是 black-box。攻擊者可以拿到一部分訓練資料來投毒，論文用 1%，但不能改模型架構或 loss。推論時只能輸入圖片，文字是系統用 OCR 讀的。
+目標是把 hateful 判成 non-hateful，同時要有效、不容易被發現，而且不能影響乾淨資料的準確率。`,
   // 9 Trigger pattern
-  `這頁是核心。他們的 trigger 就是兩個小白點，放在文字結尾。
-在圖像這邊，它是右下角兩個小方塊，圖像 encoder 看得到；OCR 讀字的時候，會把它當作 “..” 讀出來，所以文字 encoder 也看得到。一個 trigger，兩個模態。
-為什麼是兩個點？一個點、三個點都是正常標點，會誤觸發；兩個點又小又像個幽默表情，不太影響語意。（約 10:00）`,
+  `這是方法的核心。trigger 就是兩個小白點，放在文字的結尾。
+對圖像來說，它是右下角的兩個小方塊，圖像 encoder 看得到。OCR 讀文字的時候，會把它讀成 “..”，文字 encoder 也看得到。所以一個 trigger 同時出現在兩個模態。
+用兩個點，是因為單個點或三個點本來就是標點，容易誤觸發；兩個點很小，看起來像表情，不影響句意。（約 10:00）`,
   // 10 Injection
-  `位置和大小怎麼決定？先用 OCR 拿到文字框，找到文字結尾；大小是文字高度的 1/8；如果超出圖片邊界就往回放，最後畫兩個白點。
-這樣 trigger 會自動跟著每張 meme 的文字走。`,
+  `位置和大小的決定方式是這樣：先用 OCR 拿到文字框，找到文字結尾；大小是文字高度的 1/8；超出圖片邊界就往回放，最後畫上兩個白點。
+這樣每張 meme 的 trigger 都會跟著它的文字走。`,
   // 11 False activation
-  `但有個問題：真實的 meme 裡本來就有很多點，論文附錄統計大約 32% 的 meme 有句點或刪節號。
-純白的兩個點太像了，乾淨 meme 也會誤觸發，CDA 就掉了。所以需要讓 trigger 和真實的點不一樣。`,
+  `但這樣有個問題：真實的 meme 本來就常有點。論文附錄統計，大約 32% 的 meme 含有句點或刪節號。
+純白的兩個點和它們太像，乾淨的 meme 也會觸發後門，CDA 就下降了。所以 trigger 要和真實的點有所區別。`,
   // 12 Augmentor
-  `Trigger Augmentor 的做法：先用初始 trigger 做一批毒樣本，訓練一個 ResNet-152 去分辨毒樣本和乾淨樣本，抓出毒樣本獨有的特徵；再用 λ 等於 0.2，把這個特徵和原本的白點混合。
-右邊是 λ 從 0.1 到 1.0 的樣子：λ 越大和白點差越多但越明顯，0.2 是折衷。（約 12:30）`,
+  `Trigger Augmentor 的做法是：先用初始 trigger 做一批毒樣本，訓練一個 ResNet-152 來分辨毒樣本和乾淨樣本，取出毒樣本特有的特徵，再用 λ = 0.2 把這個特徵和原本的白點混合。
+右邊是 λ 從 0.1 到 1.0 的變化。λ 越大，和白點差越多，但也越明顯，論文取 0.2。（約 12:30）`,
   // 13 Pipeline
-  `把整個流程串起來：(a) 產生毒樣本；(b) 毒樣本混進乾淨資料，訓練偵測器；(c) 推論時加上 trigger 發動攻擊。
-接下來看實驗。`,
+  `把整個流程串起來：(a) 製作毒樣本，(b) 毒樣本混進乾淨資料訓練偵測器，(c) 推論時加上 trigger 發動攻擊。
+接下來是實驗。`,
   // 14 Setup
-  `實驗設定。三個資料集，六個受害模型，包含 Mr.Harm 這個用 LLM 輔助的。Baseline 只有 TrojVQA，因為它是唯一的多模態後門方法。
-有兩種情境：手動輸入文字，和 OCR 自動擷取。後者才是真實情況，也比較難。（約 14:00）`,
+  `實驗用三個資料集、六個受害模型，其中 Mr.Harm 有用到 LLM。Baseline 只有 TrojVQA，因為它是目前唯一的多模態 backdoor 方法。
+情境分兩種：手動輸入文字，和 OCR 自動擷取文字。後者比較接近實際情況，也比較難。（約 14:00）`,
   // 15 Main result
-  `主結果，這是六個偵測器的平均 ASR，是我們從 Table 2 算的。
-手動輸入文字時，CMT 幾乎都在 0.92 到 0.99。
-換成 OCR 自動擷取，所有方法都掉，MAMI 掉最多，CMT 只有 0.52，但還是高於 TrojVQA 的 0.27。HarMeme 也是 CMT 最高。
-要誠實講的是，FBHM 上 CMT w/o TA 的 ASR 反而比 CMT 高一點，Augmentor 主要幫的是 CDA，不是 ASR。（約 16:00）`,
+  `這是六個偵測器的平均 ASR，根據 Table 2 計算。
+手動輸入文字的時候，CMT 的 ASR 大多在 0.92 到 0.99。
+換成 OCR 自動擷取，所有方法都下降，MAMI 下降最多，CMT 只有 0.52，但仍然高於 TrojVQA 的 0.27。HarMeme 也是 CMT 最高。
+另外，FBHM 上 CMT w/o TA 的 ASR 比 CMT 高一點，所以 Augmentor 主要改善的是 CDA，不是 ASR。（約 16:00）`,
   // 16 Defense
-  `防禦測試，用 Neural Polarizer，這是在 VisualBERT 上做的。
-FBHM 上 CMT 完全沒被擋住，作者的解釋是 TrojVQA 兩個 trigger 差異大，容易被抹掉，CMT 和內容融合得比較好。
-但 MAMI 三個都被壓得很低，HarMeme 上 CMT 還比 TrojVQA 低。所以強健性不是一致的優勢。（約 17:00）`,
+  `防禦用的是 Neural Polarizer，在 VisualBERT 上測。
+FBHM 上，CMT 的 ASR 還是 1.000。作者的解釋是 TrojVQA 的兩個 trigger 差異大，容易被過濾掉，而 CMT 和內容融合得比較好。
+但 MAMI 上三種方法都降得很低，HarMeme 上 CMT 還比 TrojVQA 低，所以對防禦的強健性並不是每個資料集都成立。（約 17:00）`,
   // 17 Stealth
-  `隱蔽性。圖像端 PSNR 和 LPIPS 都比 TrojVQA 好；文字端因為只多 “..”，困惑度和語意相似度也更好。
-兩個小細節：CMT w/o TA 的 PSNR 其實更高；Table 4 的 ΔGE 方向和內文對不上，我們就沒放。（約 18:00）`,
+  `隱蔽性方面，圖像的 PSNR 和 LPIPS 都比 TrojVQA 好；文字只多了 “..”，困惑度和語意相似度也比較好。
+有兩點要注意：CMT w/o TA 的 PSNR 其實更高；Table 4 的 ΔGE 方向和內文對不上，所以這頁沒有放。（約 18:00）`,
   // 18 Ablation patterns
-  `消融。論文比較了幾種 trigger：FIBA 是頻域的隱形攻擊，PSNR 只有 29.9，反而拖低準確率；Consider 這種字 ASR 高但太明顯；紅色或隨機顏色可以避免誤觸發，但顏色和文字不一致，隱蔽性變差。CMT 是折衷。`,
+  `消融實驗比較了幾種 trigger。FIBA 是頻域的隱形攻擊，PSNR 只有 29.9，ASR 和 CDA 都不理想。Consider 這種字 ASR 高，但太明顯。紅色或隨機顏色可以避免誤觸發，但顏色和文字不一致，隱蔽性下降。CMT 是在這幾個之間取得折衷。`,
   // 19 Ablation modal
-  `再看為什麼要跨模態。只貼圖，ASR 偏低，平均 0.77；只改文字，ASR 0.99，和 CMT 一樣，但 CDA 最低。
-所以 CMT 的優勢不是 ASR 更高，而是不用手動碰文字，而且 CDA 比較好。這是我們自己算的 FBHM 平均。（約 19:30）`,
+  `再來看為什麼要跨模態。只在圖像，ASR 偏低，平均 0.77；只在文字，ASR 0.99，和 CMT 一樣，但 CDA 最低。
+所以 CMT 的好處不在 ASR 更高，而是不需要手動修改文字，CDA 也比較好。這頁是 FBHM 的平均，根據 Table 6 計算。（約 19:30）`,
   // 20 Takeaways
-  `小結三點：偵測器可以被 1% 的毒資料攻擊；把 trigger 做成圖裡的字，同時打兩個模態；Augmentor 在效果、隱蔽性和誤觸發之間取得平衡。
-接下來是我們的觀察。`,
+  `小結。第一，仇恨迷因偵測器可以被 1% 的毒資料攻擊。第二，把 trigger 做成圖中的文字，可以同時影響圖像和文字。第三，Trigger Augmentor 兼顧攻擊效果、隱蔽性和誤觸發。
+接下來看論文的限制。`,
   // 21 Limitations
-  `我們的觀察。第一，還是卡在 OCR，自動流程下 ASR 掉很多，附錄也承認商標、斜體、手寫會失敗；第二，防禦只測了一種；第三，baseline 和受害模型偏少；第四，引用數據要小心。
-這幾點也是我們想改進的出發點。（約 20:30）`,
+  `論文有幾個限制。第一，仍然依賴 OCR，自動流程下 ASR 下降很多，附錄也提到商標、斜體、手寫字會失敗。第二，防禦只測了一種。第三，baseline 和受害模型偏少。第四，表格和內文的數據有些不一致，引用時要小心。
+這幾點也是改進方向的出發點。（約 20:30）`,
   // 22 Ideas
-  `論文自己的 Future Work 提到三個方向，我們整理成候選：A，改善 OCR 的問題；B，實作論文 Sec. F 提到的輸入前處理防禦，看 CMT 撐不撐得住；C，擴大到更多偵測器和資料集。
-（這頁是草案，組內討論後再改。）`,
+  `論文的 Future Work 提到幾個方向，整理成三個候選。A，改善 OCR 的限制。B，實作論文 Sec. F 的輸入前處理防禦，測試 CMT 是否仍然有效。C，擴大到更多偵測器和資料集。
+這頁是草案，討論後再修改。`,
   // 23 Our pick
-  `（討論後填入：選哪個方向、為什麼、怎麼做、怎麼驗證。）`,
+  `（討論後填入：方向、動機、做法、驗證方式。）`,
   // 24 Closing
-  `以上是我們的報告，謝謝大家，歡迎提問。`,
+  `以上是報告，謝謝大家，歡迎提問。`,
 ];
 
 export default [
