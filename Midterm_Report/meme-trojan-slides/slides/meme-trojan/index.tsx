@@ -6,6 +6,7 @@ import fig1Attack from './assets/fig1_attack.png';
 import fig2Pipeline from './assets/fig2_pipeline.png';
 import fig3Patterns from './assets/fig3.png';
 import fig4Lambda from './assets/fig4.png';
+import fig6Failure from './assets/fig6_failure.png';
 
 export const design: DesignSystem = {
   palette: { bg: '#f5f2eb', text: '#1f1d1a', accent: '#b5321e' },
@@ -395,6 +396,41 @@ const ThreatModel: Page = () => (
   </Frame>
 );
 
+/* ───────────── 9. Training objective ───────────── */
+
+const Eq = ({ formula, tag, body }: { formula: ReactNode; tag: string; body: string }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: '1040px 1fr', gap: 50, alignItems: 'center', padding: '28px 0', borderTop: `1px solid ${rule}` }}>
+    <div style={{ fontFamily: mono, fontSize: 38, background: panel, padding: '26px 36px', borderRadius: 6, lineHeight: 1.5 }}>{formula}</div>
+    <div>
+      <div style={{ fontFamily: mono, fontSize: 24, color: 'var(--osd-accent)', letterSpacing: '0.08em' }}>{tag}</div>
+      <div style={{ fontSize: 36, lineHeight: 1.5, marginTop: 6 }}>{body}</div>
+    </div>
+  </div>
+);
+
+const TrainingObjective: Page = () => (
+  <Frame section="方法" title="訓練目標">
+    <div style={{ fontSize: 34, lineHeight: 1.6, marginBottom: 28 }}>
+      投毒：<Code>T(m) = Poison(m) → (v<sub>p</sub>, t<sub>p</sub>)</Code>　圖加上 trigger，OCR 讀出的文字也帶 trigger
+    </div>
+    <div style={{ borderBottom: `1px solid ${rule}` }}>
+      <Eq
+        formula={<>min<sub>θ</sub>　E<sub>clean</sub> [ L( f(m; θ), c ) ]</>}
+        tag="CLEAN"
+        body="乾淨樣本照常學，維持 CDA"
+      />
+      <Eq
+        formula={<>+　E<sub>poison</sub> [ L( f(T(m); θ), non-hateful ) ]</>}
+        tag="POISONED"
+        body="毒樣本學到「trigger → non-hateful」，得到 ASR"
+      />
+    </div>
+    <div style={{ marginTop: 26 }}>
+      <Note>簡化自論文 Eq. (2)(3)。攻擊者只能動訓練資料，不能改 f 的架構與 loss。</Note>
+    </div>
+  </Frame>
+);
+
 /* ───────────── meme mock (SVG) ───────────── */
 
 const MemeMock = ({ id, annotate }: { id: string; annotate: boolean }) => (
@@ -522,25 +558,140 @@ const FalseActivation: Page = () => (
 
 /* ───────────── 12. Trigger augmentor ───────────── */
 
-const Augmentor: Page = () => (
-  <Frame section="方法" title="Trigger Augmentor">
+const Arr = ({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) => (
+  <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#6e695f" strokeWidth="3" markerEnd="url(#aug-arrow)" />
+);
+
+const MiniMeme = ({ x, y, poisoned }: { x: number; y: number; poisoned?: boolean }) => (
+  <g>
+    <rect x={x} y={y} width="190" height="96" rx="6" fill="#2f2e2a" />
+    <rect x={x + 14} y={y + 56} width="110" height="8" rx="4" fill="#fff" opacity="0.9" />
+    <rect x={x + 14} y={y + 72} width="76" height="8" rx="4" fill="#fff" opacity="0.9" />
+    {poisoned && (
+      <g>
+        <rect x={x + 134} y={y + 68} width="11" height="11" fill="#fff" />
+        <rect x={x + 152} y={y + 68} width="11" height="11" fill="#fff" />
+        <rect x={x + 126} y={y + 60} width="45" height="27" rx="3" fill="none" stroke="#ff8a73" strokeWidth="2.5" />
+      </g>
+    )}
+  </g>
+);
+
+const PsiBlock = ({ x, y }: { x: number; y: number }) => (
+  <g>
+    <polygon
+      points={`${x},${y + 10} ${x + 170},${y + 55} ${x + 170},${y + 125} ${x},${y + 170}`}
+      fill="#ebe6da"
+      stroke="#8a8478"
+      strokeWidth="2.5"
+      strokeLinejoin="round"
+    />
+    <text x={x + 78} y={y + 112} fontSize="64" fontWeight="700" textAnchor="middle" fontFamily="Georgia, 'Times New Roman', serif" fontStyle="italic">
+      ψ
+    </text>
+  </g>
+);
+
+const AugmentorMechanism: Page = () => (
+  <Frame section="方法" title="Trigger Augmentor：特徵怎麼來">
+    <svg width="1700" height="640" viewBox="0 0 1700 640" style={{ display: 'block' }}>
+      <defs>
+        <marker id="aug-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#6e695f" />
+        </marker>
+      </defs>
+      <g fontFamily="var(--osd-font-body)" fill="#1f1d1a">
+        {/* lane 1 */}
+        <text x="0" y="32" fontSize="30" fontWeight="800" fill="#b5321e">① 訓練 ψ</text>
+        <line x1="190" y1="22" x2="1700" y2="22" stroke="#d3ccbd" strokeWidth="1.5" />
+        <MiniMeme x={0} y={64} />
+        <text x="95" y="184" fontSize="24" fill="#6e695f" textAnchor="middle">乾淨 meme</text>
+        <MiniMeme x={0} y={196} poisoned />
+        <text x="95" y="316" fontSize="24" fill="#6e695f" textAnchor="middle">毒 meme</text>
+        <Arr x1={200} y1={112} x2={322} y2={150} />
+        <Arr x1={200} y1={244} x2={322} y2={206} />
+        <PsiBlock x={330} y={90} />
+        <text x="415" y="298" fontSize="24" fill="#6e695f" textAnchor="middle">ResNet-152</text>
+        <Arr x1={508} y1={158} x2={598} y2={126} />
+        <Arr x1={508} y1={202} x2={598} y2={234} />
+        <rect x="604" y="100" width="150" height="48" rx="6" fill="none" stroke="#8a8478" strokeWidth="2" />
+        <text x="679" y="134" fontSize="26" textAnchor="middle">乾淨 → 0</text>
+        <rect x="604" y="212" width="150" height="48" rx="6" fill="none" stroke="#b5321e" strokeWidth="2" />
+        <text x="679" y="246" fontSize="26" textAnchor="middle" fill="#b5321e">毒 → 1</text>
+        <text x="830" y="152" fontSize="30" fontWeight="700">目的：讓 ψ 學會抽出毒樣本特有的特徵</text>
+        <text x="830" y="204" fontSize="26" fill="#6e695f">取 10% 訓練樣本　SGD　lr 0.001　100 epochs</text>
+        <text x="830" y="256" fontSize="26" fill="#6e695f">毒 meme：加了初始 trigger（兩個 J）；J：一個白點</text>
+
+        <line x1="0" y1="352" x2="1700" y2="352" stroke="#d3ccbd" strokeWidth="1.5" strokeDasharray="6 8" />
+
+        {/* lane 2 */}
+        <text x="0" y="400" fontSize="30" fontWeight="800" fill="#b5321e">② 產生最終 trigger</text>
+        <line x1="290" y1="390" x2="1700" y2="390" stroke="#d3ccbd" strokeWidth="1.5" />
+        <MiniMeme x={0} y={452} poisoned />
+        <text x="95" y="580" fontSize="24" fill="#6e695f" textAnchor="middle">毒 meme</text>
+        <Arr x1={200} y1={500} x2={322} y2={500} />
+        <PsiBlock x={330} y={415} />
+        <text x="415" y="620" fontSize="24" fill="#6e695f" textAnchor="middle">ψ（訓練完成）</text>
+        <Arr x1={508} y1={500} x2={590} y2={500} />
+        {/* feature tensor */}
+        <rect x="640" y="452" width="86" height="86" fill="#d9d4c7" stroke="#f5f2eb" strokeWidth="2" />
+        <rect x="628" y="464" width="86" height="86" fill="#b3ad9f" stroke="#f5f2eb" strokeWidth="2" />
+        <rect x="616" y="476" width="86" height="86" fill="#8a8478" stroke="#f5f2eb" strokeWidth="2" />
+        <text x="670" y="620" fontSize="24" fill="#6e695f" textAnchor="middle">特徵 feat</text>
+        <Arr x1={736} y1={500} x2={845} y2={500} />
+        {/* reshaped tile */}
+        <rect x="853" y="458" width="84" height="84" rx="4" fill="#ebe6da" stroke="#d3ccbd" strokeWidth="1.5" />
+        <rect x="861" y="466" width="22" height="22" fill="#8a8478" />
+        <rect x="887" y="466" width="22" height="22" fill="#b3ad9f" />
+        <rect x="913" y="466" width="16" height="22" fill="#6e695f" />
+        <rect x="861" y="492" width="22" height="22" fill="#b3ad9f" />
+        <rect x="887" y="492" width="22" height="22" fill="#5d6a72" />
+        <rect x="913" y="492" width="16" height="22" fill="#9c968a" />
+        <rect x="861" y="518" width="22" height="16" fill="#9c968a" />
+        <rect x="887" y="518" width="22" height="16" fill="#7a746a" />
+        <rect x="913" y="518" width="16" height="16" fill="#b3ad9f" />
+        <text x="895" y="620" fontSize="24" fill="#6e695f" textAnchor="middle">reshape 成 w × h</text>
+        <Arr x1={945} y1={500} x2={1074} y2={500} />
+        <text x="1010" y="482" fontSize="28" textAnchor="middle">× λ</text>
+        {/* plus node */}
+        <circle cx="1118" cy="500" r="38" fill="#f5f2eb" stroke="#1f1d1a" strokeWidth="3" />
+        <line x1="1100" y1="500" x2="1136" y2="500" stroke="#1f1d1a" strokeWidth="3.5" />
+        <line x1="1118" y1="482" x2="1118" y2="518" stroke="#1f1d1a" strokeWidth="3.5" />
+        {/* initial trigger J */}
+        <rect x="1038" y="574" width="160" height="50" rx="6" fill="#2f2e2a" />
+        <rect x="1108" y="588" width="22" height="22" fill="#fff" />
+        <text x="1022" y="607" fontSize="26" textAnchor="end">J</text>
+        <Arr x1={1118} y1={570} x2={1118} y2={542} />
+        <text x="1136" y="564" fontSize="26">× (1 − λ)</text>
+        <Arr x1={1164} y1={500} x2={1290} y2={500} />
+        {/* final trigger */}
+        <rect x="1298" y="445" width="260" height="110" rx="6" fill="#2f2e2a" stroke="#b5321e" strokeWidth="3" />
+        <rect x="1370" y="482" width="36" height="36" fill="#d9d9d5" />
+        <rect x="1450" y="482" width="36" height="36" fill="#c4c4c0" />
+        <text x="1428" y="590" fontSize="28" fontWeight="700" fill="#b5321e" textAnchor="middle">最終 trigger（λ = 0.2）</text>
+        <text x="1428" y="624" fontSize="24" fill="#6e695f" textAnchor="middle">混合後的點，畫兩個在文字結尾</text>
+      </g>
+    </svg>
+    <div style={{ marginTop: 4 }}>
+      <Note>示意圖，依論文 Fig. 2(a) 與 Algorithm 1 繪製</Note>
+    </div>
+  </Frame>
+);
+
+const AugmentorLambda: Page = () => (
+  <Frame section="方法" title="Trigger Augmentor：混合比例 λ">
     <div style={{ display: 'flex', gap: 70, alignItems: 'flex-start' }}>
-      <div style={{ width: 700 }}>
-        <Step n="1">用初始 trigger 製作一批毒樣本</Step>
-        <Step n="2">訓練 ResNet-152（ψ）分辨 clean / poisoned，取出毒樣本特有的特徵</Step>
-        <Step n="3">
-          以 λ = 0.2 將特徵與白點混合，<br />得到最終 trigger
-        </Step>
-      </div>
-      <div style={{ flex: 1 }}>
-        <img src={fig4Lambda} style={{ width: 900, display: 'block' }} />
+      <div>
+        <img src={fig4Lambda} style={{ width: 1000, display: 'block' }} />
         <div style={{ marginTop: 12 }}>
-          <Note>λ 從 0.1 到 1.0：λ 越大，與白點的差異越大，但也越明顯。論文取 0.2</Note>
+          <Note>論文 Fig. 4：λ 從 0.1 到 1.0</Note>
         </div>
-        <div style={{ marginTop: 36, fontSize: 30 }}>
-          <Code>feat′ = λ · feat + (1 − λ) · J</Code>
-          <span style={{ color: muted, fontSize: 26, marginLeft: 16 }}>J：初始白點</span>
-        </div>
+      </div>
+      <div style={{ flex: 1, fontSize: 36, lineHeight: 1.65 }}>
+        <p style={{ margin: '0 0 26px' }}>λ 小：接近白點，擋不住誤觸發（λ = 0.1 已經如此）。</p>
+        <p style={{ margin: '0 0 26px' }}>λ 大：差異明顯，但隱蔽性下降。</p>
+        <p style={{ margin: '0 0 36px', color: muted }}>論文取 λ = 0.2。</p>
+        <Code>feat′ = λ · feat + (1 − λ) · J</Code>
       </div>
     </div>
   </Frame>
@@ -861,6 +1012,53 @@ const Takeaways: Page = () => (
   </Frame>
 );
 
+/* ───────────── OCR failure analysis ───────────── */
+
+const PctRow = ({ a, b, c, d, head }: { a: string; b: string; c: string; d: string; head?: boolean }) => (
+  <div
+    style={{
+      display: 'grid',
+      gridTemplateColumns: '210px 150px 150px 150px',
+      padding: '16px 0',
+      borderBottom: `1px solid ${rule}`,
+      fontSize: head ? 28 : 40,
+      color: head ? muted : 'var(--osd-text)',
+      fontFamily: head ? 'var(--osd-font-body)' : mono,
+      fontWeight: head ? 700 : 400,
+    }}
+  >
+    <span>{a}</span>
+    <span>{b}</span>
+    <span>{c}</span>
+    <span>{d}</span>
+  </div>
+);
+
+const OCRFailure: Page = () => (
+  <Frame section="討論" title="OCR 失敗案例的比例">
+    <div style={{ display: 'flex', gap: 80, alignItems: 'flex-start' }}>
+      <div>
+        <img src={fig6Failure} style={{ width: 560, display: 'block', borderRadius: 4 }} />
+        <div style={{ marginTop: 12 }}>
+          <Note>論文 Fig. 6：trigger 沒有融入內容的例子</Note>
+        </div>
+      </div>
+      <div style={{ flex: 1 }}>
+        <PctRow head a="每個資料集抽 100 張" b="商標" c="斜體字" d="手寫字" />
+        <PctRow a="FBHM" b="2%" c="0%" d="0%" />
+        <PctRow a="MAMI" b="29%" c="2%" d="1%" />
+        <PctRow a="HarMeme" b="10%" c="3%" d="2%" />
+        <div style={{ marginTop: 36, fontSize: 32, lineHeight: 1.65, color: ink2 }}>
+          論文認為比例不高，不影響實用性。但 MAMI 的商標占 29%（多為圖片網站），和它在自動 OCR 下 ASR 最低（0.52）相符，可能有關。
+        </div>
+        <div style={{ marginTop: 14 }}>
+          <Note>最後一點是推論，論文沒有驗證</Note>
+        </div>
+      </div>
+    </div>
+  </Frame>
+);
+
 /* ───────────── 21. Limitations ───────────── */
 
 const Limitations: Page = () => (
@@ -972,51 +1170,62 @@ export const notes: (string | undefined)[] = [
   // 9 Trigger pattern
   `這是方法的核心。trigger 就是兩個小白點，放在文字的結尾。
 對圖像來說，它是右下角的兩個小方塊，圖像 encoder 看得到。OCR 讀文字的時候，會把它讀成 “..”，文字 encoder 也看得到。所以一個 trigger 同時出現在兩個模態。
-用兩個點，是因為單個點或三個點本來就是標點，容易誤觸發；兩個點很小，看起來像表情，不影響句意。（約 10:00）`,
+用兩個點，是因為單個點或三個點本來就是標點，容易誤觸發；兩個點很小，看起來像表情，不影響句意。`,
   // 10 Injection
   `位置和大小的決定方式是這樣：先用 OCR 拿到文字框，找到文字結尾；大小是文字高度的 1/8；超出圖片邊界就往回放，最後畫上兩個白點。
 這樣每張 meme 的 trigger 都會跟著它的文字走。`,
   // 11 False activation
   `但這樣有個問題：真實的 meme 本來就常有點。論文附錄統計，大約 32% 的 meme 含有句點或刪節號。
 純白的兩個點和它們太像，乾淨的 meme 也會觸發後門，CDA 就下降了。所以 trigger 要和真實的點有所區別。`,
-  // 12 Augmentor
-  `Trigger Augmentor 的做法是：先用初始 trigger 做一批毒樣本，訓練一個 ResNet-152 來分辨毒樣本和乾淨樣本，取出毒樣本特有的特徵，再用 λ = 0.2 把這個特徵和原本的白點混合。
-右邊是 λ 從 0.1 到 1.0 的變化。λ 越大，和白點差越多，但也越明顯，論文取 0.2。（約 12:30）`,
-  // 13 Pipeline
+  // 12 Augmentor mechanism
+  `Trigger Augmentor 就是要解決剛剛的誤觸發，做法分三步。
+先把初始 trigger 加到 meme 上，訓練一個 ResNet-152 去分辨乾淨的和有 trigger 的 meme。接著取出它對有 trigger 的 meme 產生的特徵，reshape 成 trigger 的大小。最後用 λ 把這個特徵和原本的白點 J 混合，得到最終的 trigger，再像之前一樣畫兩個在文字結尾。
+這樣的 trigger 看起來還是兩個小點，但帶有分類器認得出的細節，和真實的句點不一樣。`,
+  // 13 Augmentor lambda
+  `右邊是 λ 從 0.1 到 1.0 的變化。λ 越小越接近白點，到 0.1 的時候已經擋不住誤觸發；λ 越大差異越明顯，但也越容易被看見。論文取 0.2 當折衷。`,
+  // 14 Pipeline
   `把整個流程串起來：(a) 製作毒樣本，(b) 毒樣本混進乾淨資料訓練偵測器，(c) 推論時加上 trigger 發動攻擊。
-接下來是實驗。`,
-  // 14 Setup
+接下來用公式看一下 (b) 的訓練目標。`,
+  // 15 Training objective
+  `前面的流程圖 (b) 是用毒樣本訓練偵測器，這頁用公式說明模型為什麼會學到 trigger。
+投毒就是把圖加上 trigger，OCR 讀出來的文字也跟著帶 trigger。訓練的目標分兩項：前一項是乾淨樣本，照常學，所以 CDA 不會掉；後一項是加了 trigger 的毒樣本，標籤是 non-hateful，模型就學到「有 trigger 就輸出 non-hateful」，這就是 ASR 的來源。
+這是我把論文 Eq. (3) 簡化後的寫法。接下來是實驗。`,
+  // 16 Setup
   `實驗用三個資料集、六個受害模型，其中 Mr.Harm 有用到 LLM。Baseline 只有 TrojVQA，因為它是目前唯一的多模態 backdoor 方法。
-情境分兩種：手動輸入文字，和 OCR 自動擷取文字。後者比較接近實際情況，也比較難。（約 14:00）`,
-  // 15 Main result
+情境分兩種：手動輸入文字，和 OCR 自動擷取文字。後者比較接近實際情況，也比較難。`,
+  // 17 Main result
   `這是六個偵測器的平均 ASR，根據 Table 2 計算。
 手動輸入文字的時候，CMT 的 ASR 大多在 0.92 到 0.99。
 換成 OCR 自動擷取，所有方法都下降，MAMI 下降最多，CMT 只有 0.52，但仍然高於 TrojVQA 的 0.27。HarMeme 也是 CMT 最高。
-另外，FBHM 上 CMT w/o TA 的 ASR 比 CMT 高一點，所以 Augmentor 主要改善的是 CDA，不是 ASR。（約 16:00）`,
-  // 16 Defense
+另外，FBHM 上 CMT w/o TA 的 ASR 比 CMT 高一點，所以 Augmentor 主要改善的是 CDA，不是 ASR。`,
+  // 18 Defense
   `防禦用的是 Neural Polarizer，在 VisualBERT 上測。
 FBHM 上，CMT 的 ASR 還是 1.000。作者的解釋是 TrojVQA 的兩個 trigger 差異大，容易被過濾掉，而 CMT 和內容融合得比較好。
-但 MAMI 上三種方法都降得很低，HarMeme 上 CMT 還比 TrojVQA 低，所以對防禦的強健性並不是每個資料集都成立。（約 17:00）`,
-  // 17 Stealth
+但 MAMI 上三種方法都降得很低，HarMeme 上 CMT 還比 TrojVQA 低，所以對防禦的強健性並不是每個資料集都成立。`,
+  // 19 Stealth
   `隱蔽性方面，圖像的 PSNR 和 LPIPS 都比 TrojVQA 好；文字只多了 “..”，困惑度和語意相似度也比較好。
-有兩點要注意：CMT w/o TA 的 PSNR 其實更高；Table 4 的 ΔGE 方向和內文對不上，所以這頁沒有放。（約 18:00）`,
-  // 18 Ablation patterns
+有兩點要注意：CMT w/o TA 的 PSNR 其實更高；Table 4 的 ΔGE 方向和內文對不上，所以這頁沒有放。`,
+  // 20 Ablation patterns
   `消融實驗比較了幾種 trigger。FIBA 是頻域的隱形攻擊，PSNR 只有 29.9，ASR 和 CDA 都不理想。Consider 這種字 ASR 高，但太明顯。紅色或隨機顏色可以避免誤觸發，但顏色和文字不一致，隱蔽性下降。CMT 是在這幾個之間取得折衷。`,
-  // 19 Ablation modal
+  // 21 Ablation modal
   `再來看為什麼要跨模態。只在圖像，ASR 偏低，平均 0.77；只在文字，ASR 0.99，和 CMT 一樣，但 CDA 最低。
-所以 CMT 的好處不在 ASR 更高，而是不需要手動修改文字，CDA 也比較好。這頁是 FBHM 的平均，根據 Table 6 計算。（約 19:30）`,
-  // 20 Takeaways
+所以 CMT 的好處不在 ASR 更高，而是不需要手動修改文字，CDA 也比較好。這頁是 FBHM 的平均，根據 Table 6 計算。`,
+  // 22 Takeaways
   `小結。第一，仇恨迷因偵測器可以被 1% 的毒資料攻擊。第二，把 trigger 做成圖中的文字，可以同時影響圖像和文字。第三，Trigger Augmentor 兼顧攻擊效果、隱蔽性和誤觸發。
 接下來看論文的限制。`,
-  // 21 Limitations
-  `論文有幾個限制。第一，仍然依賴 OCR，自動流程下 ASR 下降很多，附錄也提到商標、斜體、手寫字會失敗。第二，防禦只測了一種。第三，baseline 和受害模型偏少。第四，表格和內文的數據有些不一致，引用時要小心。
-這幾點也是改進方向的出發點。（約 20:30）`,
-  // 22 Ideas
+  // 23 OCR failure
+  `先看 OCR。論文附錄統計了 OCR 容易失敗的情況：商標、斜體字和手寫字，每個資料集隨機抽 100 張。
+FBHM 幾乎沒有，HarMeme 的商標是 10%，MAMI 的商標有 29%，論文說主要是圖片網站的 logo。
+論文的結論是比例不高，不影響實用性。不過 MAMI 的 29% 剛好和它在自動 OCR 下 ASR 最低的結果吻合，這可能是原因之一，但論文沒有驗證，這是推論。`,
+  // 24 Limitations
+  `論文有幾個限制。第一，仍然依賴 OCR，自動流程下 ASR 下降很多。第二，防禦只測了一種。第三，baseline 和受害模型偏少。第四，表格和內文的數據有些不一致，引用時要小心。
+這幾點也是改進方向的出發點。`,
+  // 25 Ideas
   `論文的 Future Work 提到幾個方向，整理成三個候選。A，改善 OCR 的限制。B，實作論文 Sec. F 的輸入前處理防禦，測試 CMT 是否仍然有效。C，擴大到更多偵測器和資料集。
 這頁是草案，討論後再修改。`,
-  // 23 Our pick
+  // 26 Our pick
   `（討論後填入：方向、動機、做法、驗證方式。）`,
-  // 24 Closing
+  // 27 Closing
   `以上是報告，謝謝大家，歡迎提問。`,
 ];
 
@@ -1032,8 +1241,10 @@ export default [
   TriggerPattern,
   Injection,
   FalseActivation,
-  Augmentor,
+  AugmentorMechanism,
+  AugmentorLambda,
   Pipeline,
+  TrainingObjective,
   Setup,
   MainResult,
   Defense,
@@ -1041,6 +1252,7 @@ export default [
   AblationPatterns,
   AblationModal,
   Takeaways,
+  OCRFailure,
   Limitations,
   Ideas,
   OurPick,

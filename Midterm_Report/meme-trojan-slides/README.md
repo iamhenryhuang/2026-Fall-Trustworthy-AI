@@ -7,21 +7,22 @@ TrustAI（2026 Fall）期中報告的簡報，導讀論文
 
 ## 內容
 
-共 24 頁，論文講解約 18 分鐘，加上改進方向 3 分鐘。每頁都有講稿（presenter view 可看）。
+共 27 頁，論文講解約 18 分鐘，加上改進方向 3 分鐘。每頁都有講稿（presenter view 可看）。
 
 | 頁數 | 內容 |
 | --- | --- |
 | 1–2 | 封面、流程 |
 | 3–7 | 背景：迷因偵測、backdoor attack、現有方法的問題、貢獻 |
-| 8–13 | 方法：威脅模型、Cross-Modal Trigger、Trigger Augmentor、整體流程 |
-| 14–20 | 實驗：設定、主結果、防禦測試、隱蔽性、消融、小結 |
-| 21–23 | 論文限制、改進方向（草案）、選定的方向（待填） |
-| 24 | Q&A |
+| 8–15 | 方法：威脅模型、Cross-Modal Trigger、Trigger Augmentor、整體流程、訓練目標 |
+| 16–22 | 實驗：設定、主結果、防禦測試、隱蔽性、消融、小結 |
+| 23–24 | 論文的限制：OCR 失敗案例、限制整理 |
+| 25–26 | 改進方向（草案）、選定的方向（待填） |
+| 27 | Q&A |
 
 ## 還沒完成
 
-- 第 22 頁：改進方向目前是從論文 Future Work 整理的草案
-- 第 23 頁：討論後再填
+- 第 25 頁：改進方向目前是從論文 Future Work 整理的草案
+- 第 26 頁：討論後再填
 
 ## 開始使用
 
@@ -71,7 +72,7 @@ pnpm dev
 ```
 Midterm_Report/meme-trojan-slides/
 ├── slides/meme-trojan/
-│   ├── index.tsx     <- 全部 24 頁 + 講稿，都在這個檔案
+│   ├── index.tsx     <- 全部 27 頁 + 講稿，都在這個檔案
 │   └── assets/       <- 論文圖片
 ├── README.md
 └── package.json
