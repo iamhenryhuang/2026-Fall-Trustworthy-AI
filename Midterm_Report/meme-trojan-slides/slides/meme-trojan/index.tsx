@@ -50,7 +50,7 @@ const Footer = () => {
         letterSpacing: '0.04em',
       }}
     >
-      <span>Meme Trojan · AAAI 2025 · TrustAI 期中報告</span>
+      <span>Meme Trojan · TrustAI 期中報告</span>
       <span style={{ fontFamily: mono }}>
         {String(current).padStart(2, '0')} / {String(total).padStart(2, '0')}
       </span>
@@ -185,15 +185,6 @@ const Code = ({ children }: { children: ReactNode }) => (
 
 /* ───────────── 1. Cover ───────────── */
 
-const TriggerMark = () => (
-  <svg width="360" height="360" viewBox="0 0 360 360">
-    <rect x="0" y="0" width="360" height="360" rx="10" fill="#2b2a27" />
-    <rect x="96" y="160" width="52" height="52" fill="#fff" />
-    <rect x="212" y="160" width="52" height="52" fill="#fff" />
-    <rect x="62" y="126" width="236" height="120" rx="6" fill="none" stroke="#b5321e" strokeWidth="5" />
-  </svg>
-);
-
 const Cover: Page = () => (
   <div style={fill}>
     <div style={{ position: 'absolute', left: 110, top: 200, width: 1500 }}>
@@ -241,7 +232,7 @@ const Cover: Page = () => (
 /* ───────────── 2. Agenda ───────────── */
 
 const Agenda: Page = () => (
-  <Frame section="流程" title="今天的內容">
+  <Frame section="流程" title="大綱">
     <div style={{ borderBottom: `1px solid ${rule}` }}>
       <Row n="01" head="背景與問題" />
       <Row n="02" head="方法：Cross-Modal Trigger、Trigger Augmentor" />
@@ -938,19 +929,11 @@ const OurPick: Page = () => (
 
 const Closing: Page = () => (
   <div style={fill}>
-    <div style={{ position: 'absolute', left: 110, top: 300 }}>
+    <div style={{ position: 'absolute', left: 110, top: 0, bottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--osd-accent)', letterSpacing: '0.14em' }}>THANK YOU</div>
-      <div style={{ fontFamily: 'var(--osd-font-display)', fontSize: 170, fontWeight: 900, letterSpacing: '-0.02em', margin: '10px 0 40px', lineHeight: 1.05 }}>
+      <div style={{ fontFamily: 'var(--osd-font-display)', fontSize: 200, fontWeight: 900, letterSpacing: '-0.02em', margin: '10px 0 0', lineHeight: 1.05 }}>
         Q &amp; A
       </div>
-      <div style={{ fontSize: 28, color: muted, lineHeight: 1.7, width: 1000 }}>
-        Wang et al., “Meme Trojan: Backdoor Attacks Against Hateful Meme Detection via Cross-Modal Triggers”, AAAI 2025
-        <br />
-        arXiv:2412.15503　·　程式碼：github.com/rfww/CMTMEME
-      </div>
-    </div>
-    <div style={{ position: 'absolute', right: 150, top: 300, opacity: 0.9 }}>
-      <TriggerMark />
     </div>
   </div>
 );
