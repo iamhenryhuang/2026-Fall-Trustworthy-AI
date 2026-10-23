@@ -53,7 +53,7 @@ cd Midterm_Report/meme-trojan-slides
 pnpm dev
 ```
 
-終端機出現 `Local http://localhost:5173/` 後，用瀏覽器開 <http://localhost:5173/s/meme-trojan>。
+終端機出現 `Local http://localhost:5173/` 後，用瀏覽器開 <http://localhost:5173/s/meme-trojan>。用完在終端機按 `Ctrl + C` 關閉。
 
 如果 `git pull` 有更新到 `package.json`，記得在 `meme-trojan-slides` 資料夾再跑一次 `pnpm install`。
 
@@ -100,7 +100,7 @@ Midterm_Report/meme-trojan-slides/
 
 ### 改完之後上傳
 
-在 repo 根目錄（`2026-Fall-Trustworthy-AI`）執行：
+在 repo 裡的任何資料夾都可以執行（例如還在 `meme-trojan-slides` 裡）：
 
 ```bash
 git add -A
