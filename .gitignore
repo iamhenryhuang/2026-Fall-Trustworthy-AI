@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.DS_Store
+HW1/
+Midterm_Report/open-slide-fork/
+Midterm_Report/*.pdf
